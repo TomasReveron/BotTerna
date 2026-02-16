@@ -1,0 +1,14 @@
+{
+  "BASE DE DATOS": {
+    "secciones": ["1MB"],
+    "inscrita": false
+  },
+  "INGENIERIA SOFTWARE I": {
+    "secciones": ["1MA"],
+    "inscrita": false
+  },
+  "INVEST. DE OPERACIONES II": {
+    "secciones": ["1MA"],
+    "inscrita": false
+  }
+}
