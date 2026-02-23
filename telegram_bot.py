@@ -59,7 +59,18 @@ def enviar_telegram(mensaje):
             if response.status != 200:
                 print(f"⚠️  Error Telegram: HTTP {response.status}")
     except Exception as e:
-        print(f"⚠️  Error enviando Telegram: {e}")
+        # Silenciamos errores comunes de red que son transitorios
+        error_msg = str(e)
+        if "104" in error_msg or "Connection reset" in error_msg:
+            # Reintentar una vez tras un pequeño sleep
+            sleep(1)
+            try:
+                with urllib.request.urlopen(url, data=payload, timeout=10, context=ssl_context) as response:
+                    pass
+            except:
+                pass
+        else:
+            print(f"⚠️  Error enviando Telegram: {e}")
 
 
 def telegram_habilitado():
@@ -84,7 +95,16 @@ def obtener_actualizaciones(offset):
             payload = json.loads(response.read().decode("utf-8"))
             return payload.get("result", []), offset
     except Exception as e:
-        print(f"⚠️  Error leyendo comandos de Telegram: {e}")
+        error_msg = str(e)
+        # Si es un error de conexión reiniciada o conflicto de webhook, lo tratamos con calma
+        if "104" in error_msg or "Connection reset" in error_msg:
+            # Es un parpadeo de red, no imprimimos nada para no ensuciar consola
+            pass
+        elif "409" in error_msg:
+            print("⚠️  Conflicto de Telegram (409): Hay un Webhook activo o otra instancia del bot corriendo.")
+            sleep(5) # Esperar un poco antes de reintentar
+        else:
+            print(f"⚠️  Error leyendo comandos de Telegram: {e}")
         return [], offset
 
 

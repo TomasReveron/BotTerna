@@ -175,7 +175,7 @@ def botinscripcion(driver):
             
             # Notificar cada 10 intentos
             if intentos % 10 == 0:
-                mensaje_espera = f"⏳ Intento {intentos}: Aún no aparecen las materias en inscripción..."
+                mensaje_espera = f"⏳ Intento {intentos}: Aun no hay cupos..."
                 print(mensaje_espera)
                 enviar_telegram(mensaje_espera)
     except KeyboardInterrupt:
