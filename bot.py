@@ -2,6 +2,7 @@ from time import sleep
 import os
 from threading import Lock
 from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -24,7 +25,7 @@ def iniciar_bot():
     print(f"📍 Usando binario en: {driver_path}")
 
     # 2. Configuracion robusta de Chrome
-    chrome_options = Options()
+    chrome_options = uc.ChromeOptions()
 
     # Argumentos para evitar bloqueos en entornos Linux/Dell Latitude
     chrome_options.add_argument("--no-sandbox")
@@ -42,11 +43,11 @@ def iniciar_bot():
 
     driver = None
     try:
-        # 3. Forzar el inicio del Servicio
-        servicio = Service(executable_path=driver_path)
-
-        print("⚙️  Lanzando instancia de navegador...")
-        driver = webdriver.Chrome(service=servicio, options=chrome_options)
+        print("⚙️  Lanzando instancia de navegador con undetected-chromedriver...")
+        driver = uc.Chrome(
+            options=chrome_options,
+            driver_executable_path=driver_path
+        )
         print("✅ Navegador iniciado con exito.")
         login(driver)
 
@@ -80,9 +81,9 @@ def login(driver):
         return
 
     try:
-        sleep(3)  # Espera inicial para asegurarse de que el navegador este listo
+        sleep(1.5)  # Espera inicial para asegurarse de que el navegador este listo
         driver.get(url)
-
+        h = input("Presiona Enter cuando estes listo para iniciar sesion...")
         print("🔐 Introduciendo credenciales...")
 
         campo_usuario = driver.find_element(By.NAME, "username")
@@ -125,6 +126,7 @@ def botinscripcion(driver):
     enviar_telegram("✅ Bot cargado. Esperando cupos...")
 
     notificacion_semestre_enviada = False
+    notificacion_materias_enviada = False
 
     try:
         while len(materias_pendientes(materias)) > 0:
@@ -141,14 +143,20 @@ def botinscripcion(driver):
             with estado_lock:
                 estado_ref["texto"] = estado
             print("🤖 Bot de inscripcion activo...")
-            procesar_materias(driver, materias)
+            materias_visibles = procesar_materias(driver, materias)
+
+            if materias_visibles and not notificacion_materias_enviada:
+                mensaje = "👀 ¡ATENCIÓN! Las materias ya están apareciendo en la página de inscripción."
+                print(mensaje)
+                enviar_telegram(mensaje)
+                notificacion_materias_enviada = True
 
             if len(materias_pendientes(materias)) == 0:
                 print("🎉 Todas las materias han sido inscritas.")
                 enviar_telegram("🎉 Todas las materias han sido inscritas.")
                 break
 
-            sleep(40)  # Espera antes de recargar la pagina
+            sleep(20)  # Espera antes de recargar la pagina
             driver.refresh()
             intentos += 1
             print("🔄 Pagina recargada para verificar nuevas inscripciones.")
@@ -175,6 +183,7 @@ def botinscripcion(driver):
 
 
 def procesar_materias(driver, materias):
+    materias_encontradas = False
     for nombre_materia, info in list(materias.items()):
         if info.get("inscrita"):
             continue
@@ -189,6 +198,7 @@ def procesar_materias(driver, materias):
             filas_materia = driver.find_elements(By.XPATH, xpath_materia)
 
             if len(filas_materia) > 0:
+                materias_encontradas = True
                 fila = filas_materia[0]  # Tomamos la primera fila que coincida
 
                 for seccion in secciones:
@@ -223,3 +233,5 @@ def procesar_materias(driver, materias):
         if materia_inscrita:
             info["inscrita"] = True
             guardar_materias(materias)
+
+    return materias_encontradas
