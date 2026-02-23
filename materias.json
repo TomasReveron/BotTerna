@@ -1,13 +1,17 @@
 {
-  "BASE DE DATOS": {
-    "secciones": ["1MB"],
-    "inscrita": false
-  },
-  "INGENIERIA SOFTWARE I": {
+  "SISTEMAS DE INFORMACION I": {
     "secciones": ["1MA"],
     "inscrita": false
   },
-  "INVEST. DE OPERACIONES II": {
+  "INGENIERIA SOFTWARE II": {
+    "secciones": ["1MA"],
+    "inscrita": false
+  },
+  "IMPLEM. BASES DE DATOS": {
+    "secciones": ["1MA"],
+    "inscrita": false
+  },
+  "PLANIFICACIÓN Y CONTROL DE PROYECTOS": {
     "secciones": ["1MA"],
     "inscrita": false
   }

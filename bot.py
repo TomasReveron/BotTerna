@@ -174,18 +174,45 @@ def procesar_materias(driver, materias):
             continue
 
         secciones = info.get("secciones", [])
-        # Coloca aqui la logica para ubicar la materia por nombre y abrirla.
         materia_inscrita = False
 
-        for seccion in secciones:
-            # Coloca aqui la logica para ubicar la seccion y presionar el boton.
-            # Si la inscripcion fue exitosa, cambia materia_inscrita a True.
-            materia_inscrita = False  # Ajusta a True cuando confirmes la inscripcion real
+        try:
+            # Buscamos una fila (tr) de tabla que contenga el nombre de la materia (sin importar mayus/minus)
+            nombre_upper = nombre_materia.upper()
+            xpath_materia = f"//tr[contains(translate(., 'abcdefghijklmnopqrstuvwxyzáéíóú', 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚ'), '{nombre_upper}')]"
+            filas_materia = driver.find_elements(By.XPATH, xpath_materia)
 
-            if materia_inscrita:
-                print(f"✅ Materia '{nombre_materia}' inscrita en seccion {seccion}.")
-                enviar_telegram(f"🎯 Materia inscrita: {nombre_materia} | Seccion {seccion}")
-                break
+            if len(filas_materia) > 0:
+                fila = filas_materia[0]  # Tomamos la primera fila que coincida
+
+                for seccion in secciones:
+                    try:
+                        # Buscamos un botón o enlace dentro de la fila de la materia que tenga el texto de la seccion
+                        xpath_seccion = f".//a[contains(text(), '{seccion}')] | .//button[contains(text(), '{seccion}')]"
+                        botones_seccion = fila.find_elements(By.XPATH, xpath_seccion)
+
+                        if len(botones_seccion) > 0:
+                            boton = botones_seccion[0]
+                            clase_boton = boton.get_attribute("class") or ""
+                            
+                            # Validar que el botón sea clicleable y no esté deshabilitado (tenga cupos)
+                            if boton.is_enabled() and 'disabled' not in clase_boton.lower():
+                                print(f"👉 Intentando inscribir '{nombre_materia}' en seccion {seccion}...")
+                                # Clic vía JS, más resistente en caso de overlays o rediseños de la tabla
+                                driver.execute_script("arguments[0].click();", boton)
+                                sleep(3) # Pausa para que el servidor procese el clic
+                                
+                                materia_inscrita = True
+                                print(f"✅ ¡Inscrita '{nombre_materia}' en seccion {seccion}!")
+                                enviar_telegram(f"🎯 Exito: {nombre_materia} | Seccion {seccion}")
+                                break # Ya la inscribimos, no necesitamos probar las demás secciones
+                            else:
+                                print(f"⚠️ Seccion {seccion} de '{nombre_materia}' parece estar llena o inactiva.")
+                    except Exception as e:
+                        print(f"❌ Error intentando clic en seccion {seccion} de '{nombre_materia}': {str(e)}")
+            
+        except Exception as e:
+            print(f"❌ Error buscando la materia '{nombre_materia}': {str(e)}")
 
         if materia_inscrita:
             info["inscrita"] = True
