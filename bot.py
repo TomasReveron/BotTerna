@@ -83,6 +83,8 @@ def login(driver, ir_a_inscripcion=True):
     try:
         sleep(1)  # Espera para que el navegador este listo
         driver.get(url)
+        if ir_a_inscripcion:
+            input("Esperando...")
         sleep(5)
         print("🔐 Iniciando sesion...")
 
