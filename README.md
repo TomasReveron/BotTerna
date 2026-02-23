@@ -1,93 +1,108 @@
-# BotTerna
+# 🤖 BotTerna - Automatización de Inscripción
 
-Bot de inscripcion con Selenium y notificaciones opcionales por Telegram.
+Bot avanzado para la automatización de inscripción en Terna (USM), optimizado para evitar detecciones y agilizar el proceso de captura de cupos.
 
-## Requisitos
+---
 
-- Python 3.9+ (recomendado 3.10 o 3.11)
-- Google Chrome instalado
-- ChromeDriver compatible con tu version de Chrome
+## 📋 Requisitos Previos
 
-## Instalacion (Windows / Linux / macOS)
+- **Python 3.9+** (Recomendado 3.11).
+- **Google Chrome** instalado en su versión más reciente.
+- **ChromeDriver**: Compatible con tu versión de Chrome.
+- **Telegram (Opcional)**: Un bot creado vía `@BotFather` si deseas recibir notificaciones.
 
-1) Clona o descarga el proyecto.
-2) Crea un entorno virtual e instala dependencias:
+---
 
-Windows (PowerShell):
-```
-python -m venv venv
-venv\Scripts\activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
+## 🛠️ Instalación Paso a Paso
 
-Linux/macOS (bash/zsh):
-```
+### 1. Preparación del Proyecto
+Clona el repositorio o descarga los archivos en una carpeta local.
+
+### 2. Configuración del Entorno Virtual (Recomendado)
+Abre una terminal en la carpeta del proyecto y ejecuta:
+
+**En Linux / macOS:**
+```bash
 python3 -m venv venv
 source venv/bin/activate
-python -m pip install --upgrade pip
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## ChromeDriver
-
-- Descarga el ChromeDriver que coincida con tu version de Chrome.
-- Ubica el binario en una ruta fija y configuralo en el .env.
-
-Notas:
-- En Windows debe terminar en .exe.
-- En Linux/macOS el archivo debe ser ejecutable (chmod +x).
-
-## Configuracion (.env)
-
-Crea un archivo .env en la raiz del proyecto con estas variables:
-
+**En Windows:**
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
-# Obligatorias
-CHROMEDRIVER_PATH=/ruta/al/chromedriver
+
+### 3. Configuración del Driver
+- Descarga el [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/) correspondiente a tu versión de Chrome.
+- Colócalo en la carpeta del proyecto.
+- **Importante (Linux/macOS):** Dale permisos de ejecución con `chmod +x chromedriver`.
+
+---
+
+## ⚙️ Configuración del Bot (`.env`)
+
+Crea un archivo llamado `.env` en la raíz del proyecto y completa los siguientes datos:
+
+```env
+# RUTA DEL DRIVER (Ejemplo en Linux: /home/user/BotTerna/chromedriver)
+CHROMEDRIVER_PATH=./chromedriver
+
+# CREDENCIALES TERNA
+USER_UNI=IngresaTuUsuarioAqui
+PASS_UNI=IngresaTuClaveAqui
+
+# URLS (Generalmente no cambian)
 URL_LOGIN=https://usm.terna.net/
 URL_INSCRIPCION=https://usm.terna.net/Inscripcion.php?mid=0
-USER_UNI=tu_usuario
-PASS_UNI=tu_password
 
-# Opcionales (Telegram)
-TOKEN=tu_token_de_bot
-CHAT_ID=tu_chat_id
-```
-
-Si no usas Telegram, puedes omitir TOKEN y CHAT_ID.
-
-## materias.json
-
-Define las materias y secciones. Ejemplo:
+# NOTIFICACIONES TELEGRAM (Opcional)
+TOKEN=8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA (Debes colocar este token para recibir notificaciones)
+CHAT_ID=TU_CHAT_ID (Obtenido de @userinfobot)
 
 ```
+
+---
+
+## 📚 Configuración de Materias (`materias.json`)
+
+Edita el archivo `materias.json` para definir qué materias quieres inscribir y en qué secciones.
+
+**Formato:**
+```json
 {
-  "Matematica I": ["01", "02"],
-  "Fisica I": {
-    "secciones": ["03"],
+  "NOMBRE DE LA MATERIA": {
+    "secciones": ["SECCION (1MA)"],
     "inscrita": false
   }
 }
 ```
+*El bot solo intentará inscribir aquellas donde `"inscrita"` sea `false`.*
 
-## Ejecutar
+---
 
-Con el entorno activado:
+## 🚀 Cómo Ejecutar
 
-```
+Asegúrate de tener el entorno virtual activado y ejecuta:
+
+```bash
 python main.py
 ```
 
-Detener con Ctrl+C.
+### Características del Bot:
+- **Bypass de Seguridad:** Utiliza `undetected-chromedriver` para evitar bloqueos.
+- **Relogueo Automático:** Cada ciclo de espera realiza un logout/login completo para mantener la sesión fresca.
+- **Detección Inteligente:** Solo intenta inscribir si detecta que hay cupos disponibles (formato `SECCIÓN:CUPOS > 0`).
+- **Notificaciones:** Te avisa por Telegram apenas las materias aparecen o se inscriben con éxito.
 
-## Telegram (opcional)
+---
 
-- Envia /status al bot para recibir el estado.
-- Asegurate de que TOKEN y CHAT_ID correspondan al mismo chat.
+## ❓ Solución de Problemas
 
-## Problemas comunes
-
-- Error de ChromeDriver: verifica version de Chrome y ruta en CHROMEDRIVER_PATH.
-- En Windows: revisa que CHROMEDRIVER_PATH termine en .exe.
-- En Linux/macOS: usa chmod +x en el chromedriver si falta permiso.
+- **Error de Conector:** Asegúrate de que la ruta en `CHROMEDRIVER_PATH` sea absoluta o relativa correcta y que el archivo tenga permisos.
+- **Detección de Bot:** El bot usa técnicas de sigilo, pero si Terna muestra un Captcha, el navegador se detendrá unos segundos para permitirte cargarlo (o puedes ajustar el `sleep` en `bot.py`).
+- **Cierre Inesperado:** Revisa que tus credenciales en el `.env` sean correctas.
