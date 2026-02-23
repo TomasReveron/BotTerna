@@ -168,7 +168,7 @@ def botinscripcion(driver):
             # Mostrar progreso en una sola linea para no llenar la consola
             print(f"\r🤖 Intento {intentos} | Esperando cupos...", end="", flush=True)
 
-            sleep(15)  # Espera optimizada
+            sleep(6)  # Espera optimizada
             reloguear(driver)
             driver.get(url)
             intentos += 1
