@@ -124,8 +124,19 @@ def botinscripcion(driver):
     driver.get(url)
     enviar_telegram("✅ Bot cargado. Esperando cupos...")
 
+    notificacion_semestre_enviada = False
+
     try:
         while len(materias_pendientes(materias)) > 0:
+            # Revisar si se activó el semestre 202602
+            if not notificacion_semestre_enviada:
+                botones_202602 = driver.find_elements(By.XPATH, "//a[contains(text(), '202602')]")
+                if len(botones_202602) > 0:
+                    mensaje = "🚨 ¡ATENCIÓN! Ya activaron el botón del nuevo semestre (202602) en Pregrado Semestral."
+                    print(mensaje)
+                    enviar_telegram(mensaje)
+                    notificacion_semestre_enviada = True
+
             estado = construir_estado(materias, intentos)
             with estado_lock:
                 estado_ref["texto"] = estado
