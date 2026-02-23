@@ -70,7 +70,7 @@ def iniciar_bot():
                 print(f"⚠️  Error al cerrar el navegador: {e}")
 
 
-def login(driver):
+def login(driver, ir_a_inscripcion=True):
     url = os.getenv("URL_LOGIN") or os.getenv("URL_UNI") or "https://usm.terna.net/"
 
     usuario = os.getenv("USER_UNI")
@@ -81,10 +81,10 @@ def login(driver):
         return
 
     try:
-        sleep(1.5)  # Espera inicial para asegurarse de que el navegador este listo
+        sleep(1)  # Espera para que el navegador este listo
         driver.get(url)
-        h = input("Presiona Enter cuando estes listo para iniciar sesion...")
-        print("🔐 Introduciendo credenciales...")
+        sleep(5)
+        print("🔐 Iniciando sesion...")
 
         campo_usuario = driver.find_element(By.NAME, "username")
         campo_usuario.send_keys(usuario)
@@ -92,15 +92,12 @@ def login(driver):
         campo_contrasena = driver.find_element(By.NAME, "password")
         campo_contrasena.send_keys(contrasena)
 
-        print("🚀 Enviando formulario de login...")
-
         boton_login = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
         boton_login.click()
 
-        # Pausa para verificar el resultado del login
-        sleep(5)
-        print("✅ Login realizado")
-        botinscripcion(driver)
+        sleep(1)
+        if ir_a_inscripcion:
+            botinscripcion(driver)
 
     except Exception as e:
         print("\n--- ERROR DURANTE EL LOGIN ---")
@@ -109,6 +106,16 @@ def login(driver):
         print(f"URL actual: {driver.current_url}")
         print("---------------------------------------")
         print("\n💡 Tip rapido: Asegurate de que los selectores de los campos de usuario y contrasena sean correctos.")
+
+
+def reloguear(driver):
+    url_logout = "https://usm.terna.net/Logout.php?"
+    try:
+        driver.get(url_logout)
+        sleep(1)
+        login(driver, ir_a_inscripcion=False)
+    except Exception as e:
+        print(f"❌ Error durante el relogueo: {e}")
 
 
 def botinscripcion(driver):
@@ -142,24 +149,27 @@ def botinscripcion(driver):
             estado = construir_estado(materias, intentos)
             with estado_lock:
                 estado_ref["texto"] = estado
-            print("🤖 Bot de inscripcion activo...")
+
             materias_visibles = procesar_materias(driver, materias)
 
             if materias_visibles and not notificacion_materias_enviada:
-                mensaje = "👀 ¡ATENCIÓN! Las materias ya están apareciendo en la página de inscripción."
-                print(mensaje)
+                mensaje = "👀 ¡Las materias ya aparecieron!"
+                print(f"\n{mensaje}")
                 enviar_telegram(mensaje)
                 notificacion_materias_enviada = True
 
             if len(materias_pendientes(materias)) == 0:
-                print("🎉 Todas las materias han sido inscritas.")
+                print("\n🎉 Todas las materias han sido inscritas.")
                 enviar_telegram("🎉 Todas las materias han sido inscritas.")
                 break
 
-            sleep(20)  # Espera antes de recargar la pagina
-            driver.refresh()
+            # Mostrar progreso en una sola linea para no llenar la consola
+            print(f"\r🤖 Intento {intentos} | Esperando cupos...", end="", flush=True)
+
+            sleep(15)  # Espera optimizada
+            reloguear(driver)
+            driver.get(url)
             intentos += 1
-            print("🔄 Pagina recargada para verificar nuevas inscripciones.")
             
             # Notificar cada 10 intentos
             if intentos % 10 == 0:
@@ -222,19 +232,19 @@ def procesar_materias(driver, materias):
 
                             # Validar que el botón sea clicleable, no esté deshabilitado y tenga cupos > 0
                             if boton.is_enabled() and 'disabled' not in clase_boton.lower() and cupos > 0:
-                                print(f"👉 Intentando inscribir '{nombre_materia}' en seccion {seccion}...")
+                                print(f"\n👉 Intentando inscribir '{nombre_materia}' en seccion {seccion}...")
                                 # Clic vía JS, más resistente en caso de overlays o rediseños de la tabla
                                 driver.execute_script("arguments[0].click();", boton)
-                                sleep(3) # Pausa para que el servidor procese el clic
+                                sleep(1.5) # Pausa para que el servidor procese el clic
                                 
                                 materia_inscrita = True
                                 print(f"✅ ¡Inscrita '{nombre_materia}' en seccion {seccion}!")
                                 enviar_telegram(f"🎯 Exito: {nombre_materia} | Seccion {seccion}")
                                 break # Ya la inscribimos, no necesitamos probar las demás secciones
-                            else:
-                                print(f"⚠️ Seccion {seccion} de '{nombre_materia}' parece estar llena o inactiva.")
-                    except Exception as e:
-                        print(f"❌ Error intentando clic en seccion {seccion} de '{nombre_materia}': {str(e)}")
+                            # Seccion llena o inactiva (silencioso para evitar spam)
+                                pass
+                    except Exception:
+                        pass
             
         except Exception as e:
             print(f"❌ Error buscando la materia '{nombre_materia}': {str(e)}")
