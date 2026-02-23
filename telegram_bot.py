@@ -1,9 +1,21 @@
 import json
 import os
+import ssl
 import urllib.parse
 import urllib.request
 from threading import Event, Lock, Thread
 from time import sleep
+
+try:
+    import certifi
+except Exception:
+    certifi = None
+
+
+def _crear_contexto_ssl():
+    if certifi:
+        return ssl.create_default_context(cafile=certifi.where())
+    return ssl.create_default_context()
 
 
 def enviar_telegram(mensaje):
@@ -18,9 +30,10 @@ def enviar_telegram(mensaje):
 
     payload = urllib.parse.urlencode({"chat_id": chat_id, "text": mensaje}).encode("utf-8")
     url = f"https://api.telegram.org/bot{token}/sendMessage"
+    ssl_context = _crear_contexto_ssl()
 
     try:
-        with urllib.request.urlopen(url, data=payload, timeout=10) as response:
+        with urllib.request.urlopen(url, data=payload, timeout=10, context=ssl_context) as response:
             if response.status != 200:
                 print(f"⚠️  Error Telegram: HTTP {response.status}")
     except Exception as e:
@@ -38,9 +51,10 @@ def obtener_actualizaciones(offset):
 
     params = urllib.parse.urlencode({"timeout": 0, "offset": offset}).encode("utf-8")
     url = f"https://api.telegram.org/bot{token}/getUpdates"
+    ssl_context = _crear_contexto_ssl()
 
     try:
-        with urllib.request.urlopen(url, data=params, timeout=10) as response:
+        with urllib.request.urlopen(url, data=params, timeout=10, context=ssl_context) as response:
             if response.status != 200:
                 return [], offset
             payload = json.loads(response.read().decode("utf-8"))
