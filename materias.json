@@ -1,18 +1,26 @@
 {
   "SISTEMAS DE INFORMACION I": {
-    "secciones": ["1MA"],
+    "secciones": [
+      "1MA"
+    ],
     "inscrita": false
   },
   "INGENIERIA SOFTWARE II": {
-    "secciones": ["1MA"],
+    "secciones": [
+      "1MA"
+    ],
     "inscrita": false
   },
   "IMPLEM. BASES DE DATOS": {
-    "secciones": ["1MA"],
-    "inscrita": false
+    "secciones": [
+      "1MA"
+    ],
+    "inscrita": true
   },
   "PLANIFICACIÓN Y CONTROL DE PROYECTOS": {
-    "secciones": ["1MA"],
+    "secciones": [
+      "1MB"
+    ],
     "inscrita": false
   }
 }

@@ -203,16 +203,25 @@ def procesar_materias(driver, materias):
 
                 for seccion in secciones:
                     try:
-                        # Buscamos un botón o enlace dentro de la fila de la materia que tenga el texto de la seccion
-                        xpath_seccion = f".//a[contains(text(), '{seccion}')] | .//button[contains(text(), '{seccion}')]"
+                        # Buscamos un botón o enlace dentro de la fila de la materia que comience con el texto de la seccion seguido de ":"
+                        xpath_seccion = f".//a[starts-with(normalize-space(text()), '{seccion}:')] | .//button[starts-with(normalize-space(text()), '{seccion}:')]"
                         botones_seccion = fila.find_elements(By.XPATH, xpath_seccion)
 
                         if len(botones_seccion) > 0:
                             boton = botones_seccion[0]
                             clase_boton = boton.get_attribute("class") or ""
+                            texto_boton = boton.text.strip()
                             
-                            # Validar que el botón sea clicleable y no esté deshabilitado (tenga cupos)
-                            if boton.is_enabled() and 'disabled' not in clase_boton.lower():
+                            # Extraer la cantidad de cupos (ej: "1MA:0" -> 0)
+                            cupos = 0
+                            try:
+                                if ":" in texto_boton:
+                                    cupos = int(texto_boton.split(":")[1].strip())
+                            except ValueError:
+                                pass # Si no se puede parsear a entero, asumimos 0 por seguridad
+
+                            # Validar que el botón sea clicleable, no esté deshabilitado y tenga cupos > 0
+                            if boton.is_enabled() and 'disabled' not in clase_boton.lower() and cupos > 0:
                                 print(f"👉 Intentando inscribir '{nombre_materia}' en seccion {seccion}...")
                                 # Clic vía JS, más resistente en caso de overlays o rediseños de la tabla
                                 driver.execute_script("arguments[0].click();", boton)
