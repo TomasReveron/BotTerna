@@ -152,6 +152,12 @@ def botinscripcion(driver):
             driver.refresh()
             intentos += 1
             print("🔄 Pagina recargada para verificar nuevas inscripciones.")
+            
+            # Notificar cada 10 intentos
+            if intentos % 10 == 0:
+                mensaje_espera = f"⏳ Intento {intentos}: Aún no aparecen las materias en inscripción..."
+                print(mensaje_espera)
+                enviar_telegram(mensaje_espera)
     except KeyboardInterrupt:
         print("\n🛑 Detenido por el usuario (Ctrl+C).")
         raise
