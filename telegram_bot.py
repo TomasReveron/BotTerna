@@ -67,7 +67,7 @@ def enviar_telegram(mensaje):
             try:
                 with urllib.request.urlopen(url, data=payload, timeout=10, context=ssl_context) as response:
                     pass
-            except:
+            except Exception:
                 pass
         else:
             print(f"⚠️  Error enviando Telegram: {e}")
@@ -82,27 +82,25 @@ def obtener_actualizaciones(offset):
     if not token:
         return [], offset
 
-    # Usamos timeout=0 para polling corto o largo según prefieras
-    params = urllib.parse.urlencode({"timeout": 0, "offset": offset})
+    # Usamos timeout=20 para Long-Polling eficiente
+    params = urllib.parse.urlencode({"timeout": 20, "offset": offset})
     url = f"https://api.telegram.org/bot{token}/getUpdates?{params}"
     ssl_context = _crear_contexto_ssl()
 
     try:
-        # Usamos GET en lugar de POST con data, a veces es más estable para urllib simple
-        with urllib.request.urlopen(url, timeout=10, context=ssl_context) as response:
+        with urllib.request.urlopen(url, timeout=25, context=ssl_context) as response:
             if response.status != 200:
                 return [], offset
             payload = json.loads(response.read().decode("utf-8"))
             return payload.get("result", []), offset
     except Exception as e:
         error_msg = str(e)
-        # Si es un error de conexión reiniciada o conflicto de webhook, lo tratamos con calma
-        if "104" in error_msg or "Connection reset" in error_msg:
-            # Es un parpadeo de red, no imprimimos nada para no ensuciar consola
+        if "104" in error_msg or "Connection reset" in error_msg or "timed out" in error_msg:
+            # Parpadeo de red o timeout normal de long polling
             pass
         elif "409" in error_msg:
-            print("⚠️  Conflicto de Telegram (409): Hay un Webhook activo o otra instancia del bot corriendo.")
-            sleep(5) # Esperar un poco antes de reintentar
+            print("⚠️  Conflicto de Telegram (409): Hay un Webhook activo u otra instancia del bot corriendo.")
+            sleep(5)
         else:
             print(f"⚠️  Error leyendo comandos de Telegram: {e}")
         return [], offset

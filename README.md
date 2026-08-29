@@ -37,10 +37,9 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configuración del Driver
-- Descarga el [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/) correspondiente a tu versión de Chrome.
-- Colócalo en la carpeta del proyecto.
-- **Importante (Linux/macOS):** Dale permisos de ejecución con `chmod +x chromedriver`.
+### 3. Configuración del Driver (Opcional)
+- El bot gestiona y descarga automáticamente el ChromeDriver compatible con tu versión de Google Chrome tanto en Windows como en Linux/macOS.
+- Si prefieres usar un binario manual, coloca el archivo `chromedriver` (o `chromedriver.exe` en Windows) en la carpeta del proyecto y especifica su ruta en el `.env`.
 
 ---
 
@@ -49,10 +48,7 @@ pip install -r requirements.txt
 Crea un archivo llamado `.env` en la raíz del proyecto y completa los siguientes datos:
 
 ```env
-# RUTA DEL DRIVER (Ejemplo en Linux: /home/user/BotTerna/chromedriver)
-CHROMEDRIVER_PATH=./chromedriver
-
-# CREDENCIALES TERNA
+# CREDENCIALES TERNA (Requerido)
 USER_UNI=IngresaTuUsuarioAqui
 PASS_UNI=IngresaTuClaveAqui
 
@@ -61,8 +57,12 @@ URL_LOGIN=https://usm.terna.net/
 URL_INSCRIPCION=https://usm.terna.net/Inscripcion.php?mid=0
 
 # NOTIFICACIONES TELEGRAM (Opcional)
-TOKEN=8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA (Debes colocar este token para recibir notificaciones)
-CHAT_ID=TU_CHAT_ID (Obtenido de @userinfobot)
+TOKEN=8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA
+CHAT_ID=TU_CHAT_ID
+
+# RUTA DEL DRIVER (Opcional - Si lo omites, se descargará automáticamente)
+# CHROMEDRIVER_PATH=./chromedriver.exe   (En Windows)
+# CHROMEDRIVER_PATH=./chromedriver       (En Linux)
 
 ```
 
