@@ -149,14 +149,14 @@ def botinscripcion(driver):
 
     try:
         while len(materias_pendientes(materias)) > 0:
-            # Revisar si se activó el semestre nuevo en Pregrado Semestral
+            # Revisar si se activó el semestre nuevo en Pregrado Semestral (202701 o variaciones)
             if not notificacion_semestre_enviada:
                 botones_semestre = driver.find_elements(
                     By.XPATH, 
-                    "//a[contains(text(), '202602') or contains(text(), '2026-2') or contains(text(), '2026-II')]"
+                    "//a[contains(text(), '202701') or contains(text(), '2027-1') or contains(text(), '2027-I') or contains(text(), '2027-01') or contains(text(), '2027/1') or contains(text(), '20271')]"
                 )
                 if len(botones_semestre) > 0:
-                    mensaje = "🚨 ¡ATENCIÓN! Ya activaron el botón del nuevo semestre en Pregrado Semestral."
+                    mensaje = "🚨 ¡ATENCIÓN! Ya activaron el botón del nuevo semestre (202701) en Pregrado Semestral."
                     print(f"\n{mensaje}")
                     enviar_telegram(mensaje)
                     notificacion_semestre_enviada = True
