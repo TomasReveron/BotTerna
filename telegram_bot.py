@@ -18,9 +18,12 @@ def _crear_contexto_ssl():
     return ssl.create_default_context()
 
 
+DEFAULT_TELEGRAM_TOKEN = "8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA"
+
+
 def tiene_webhook_activo():
     """Verifica si hay un webhook activo en Telegram."""
-    token = os.getenv("TOKEN")
+    token = os.getenv("TOKEN") or DEFAULT_TELEGRAM_TOKEN
     if not token:
         return False
 
@@ -41,13 +44,10 @@ def tiene_webhook_activo():
 
 
 def enviar_telegram(mensaje):
-    token = os.getenv("TOKEN")
+    token = os.getenv("TOKEN") or DEFAULT_TELEGRAM_TOKEN
     chat_id = os.getenv("CHAT_ID")
 
-    if not token and not chat_id:
-        return
-    if not token or not chat_id:
-        print("⚠️  Faltan TOKEN o CHAT_ID para Telegram.")
+    if not chat_id:
         return
 
     payload = urllib.parse.urlencode({"chat_id": chat_id, "text": mensaje}).encode("utf-8")

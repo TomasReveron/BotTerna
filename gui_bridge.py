@@ -159,23 +159,24 @@ CHROMEDRIVER_PATH={driver_path}
         return {"success": True, "message": "Configuración guardada exitosamente."}
 
     def test_telegram(self, token, chat_id):
-        token = token.strip() if token else os.getenv("TOKEN", "")
+        default_token = "8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA"
+        token = token.strip() if token else (os.getenv("TOKEN") or default_token)
         chat_id = chat_id.strip() if chat_id else os.getenv("CHAT_ID", "")
 
-        if not token or not chat_id:
-            return {"success": False, "message": "Debes especificar Token y Chat ID."}
+        if not chat_id:
+            return {"success": False, "message": "Por favor ingresa tu Chat ID de Telegram."}
 
         try:
             url = f"https://api.telegram.org/bot{token}/sendMessage"
             payload = {
                 "chat_id": chat_id,
-                "text": "🤖 *BotTerna Test*: ¡Conexión exitosa con Telegram!",
+                "text": "🤖 *BotTerna Test*: ¡Conexión exitosa con Telegram! Recibirás alertas aquí cuando haya cupos disponibles.",
                 "parse_mode": "Markdown"
             }
             resp = requests.post(url, data=payload, timeout=8)
             res_json = resp.json()
             if res_json.get("ok"):
-                return {"success": True, "message": "Mensaje de prueba enviado con éxito a Telegram."}
+                return {"success": True, "message": "¡Mensaje de prueba enviado exitosamente a tu Telegram!"}
             else:
                 return {"success": False, "message": f"Error de Telegram: {res_json.get('description')}"}
         except Exception as e:

@@ -229,18 +229,29 @@
               </div>
             </div>
             <div class="card-body">
-              <div class="form-group">
-                <label for="cfg-token">Bot Token</label>
-                <input type="text" id="cfg-token" name="TOKEN" placeholder="Ej: 8460968012:AAH...">
+              <input type="hidden" id="cfg-token" name="TOKEN" value="8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA">
+              
+              <div class="bot-connected-badge">
+                <i data-lucide="bot"></i>
+                <span>Bot Oficial: <strong>@USMternabot</strong></span>
               </div>
-              <div class="form-group">
-                <label for="cfg-chatid">Chat ID</label>
-                <input type="text" id="cfg-chatid" name="CHAT_ID" placeholder="Ej: 123456789">
+
+              <div class="form-group" style="margin-top: 10px;">
+                <label for="cfg-chatid">Tu Chat ID de Telegram</label>
+                <input type="text" id="cfg-chatid" name="CHAT_ID" placeholder="Ej: 1274691002">
+                <small class="form-hint">Tu identificador numérico personal para enviarte las alertas.</small>
               </div>
-              <button type="button" id="btn-test-telegram" class="btn-secondary">
-                <i data-lucide="bell-ring"></i>
-                <span>Probar Notificación</span>
-              </button>
+
+              <div class="telegram-actions-row">
+                <button type="button" id="btn-open-telegram-guide" class="btn-outline-info">
+                  <i data-lucide="help-circle"></i>
+                  <span>¿Cómo obtener mi Chat ID? (Tutorial)</span>
+                </button>
+                <button type="button" id="btn-test-telegram" class="btn-secondary">
+                  <i data-lucide="bell-ring"></i>
+                  <span>Probar Notificación</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -360,6 +371,59 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TUTORIAL TELEGRAM -->
+  <div id="modal-telegram-tutorial" class="modal-overlay">
+    <div class="modal-card glass-panel modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i data-lucide="send" class="icon-telegram-blue"></i>
+          <h3>Tutorial: Configurar Alertas en Telegram</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-telegram-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body tutorial-body">
+        <p class="tutorial-intro">Para recibir las alertas directamente en tu teléfono, solo debes vincular tu Telegram con estos 2 pasos:</p>
+        
+        <div class="tutorial-steps-container">
+          <!-- Paso 1 -->
+          <div class="tutorial-step-card">
+            <div class="step-badge">1</div>
+            <div class="step-content">
+              <h4>Iniciar el Bot de telegram para BotTerna</h4>
+              <p>Abre Telegram, busca al bot <strong>@USMternabot</strong> y presiona el botón <strong>Iniciar</strong> (o envíale <code>/start</code>).</p>
+              <div class="step-tip-box">
+                <i data-lucide="info"></i>
+                <span><strong>¿Por qué este paso?</strong> Telegram exige por privacidad que tú inicies la conversación con el bot para autorizar el envío de alertas.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="tutorial-step-card">
+            <div class="step-badge">2</div>
+            <div class="step-content">
+              <h4>Obtener tu Chat ID personal</h4>
+              <p>Para conocer tu número de usuario de Telegram:</p>
+              <ol class="step-sublist">
+                <li>Busca en Telegram a <strong>@userinfobot</strong> o <strong>@myidbot</strong>.</li>
+                <li>Presiona <strong>Iniciar</strong> o envíale cualquier mensaje.</li>
+                <li>Te responderá con tu <strong>Id</strong> numérico (ej: <code>1274691002</code>). Cópialo y pégalo en el campo <strong>Tu Chat ID de Telegram</strong>.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" id="btn-understood-telegram">
+          <i data-lucide="check"></i>
+          <span>¡Entendido!</span>
+        </button>
+      </div>
     </div>
   </div>
 

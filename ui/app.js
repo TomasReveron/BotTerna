@@ -73,6 +73,10 @@ const elements = new Proxy({}, {
       btnTogglePass: () => document.getElementById('btn-toggle-pass'),
       iconEye: () => document.getElementById('icon-eye'),
       btnTestTelegram: () => document.getElementById('btn-test-telegram'),
+      btnOpenTelegramGuide: () => document.getElementById('btn-open-telegram-guide'),
+      modalTelegramTutorial: () => document.getElementById('modal-telegram-tutorial'),
+      btnCloseTelegramModal: () => document.getElementById('btn-close-telegram-modal'),
+      btnUnderstoodTelegram: () => document.getElementById('btn-understood-telegram'),
       
       activationOverlay: () => document.getElementById('activation-overlay'),
       formActivation: () => document.getElementById('form-activation'),
@@ -941,6 +945,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // Telegram Tutorial Modal
+  if (elements.btnOpenTelegramGuide) {
+    elements.btnOpenTelegramGuide.addEventListener('click', () => {
+      if (elements.modalTelegramTutorial) {
+        elements.modalTelegramTutorial.classList.add('active');
+        lucide.createIcons({ root: elements.modalTelegramTutorial });
+      }
+    });
+  }
+
+  const closeTelegramModal = () => {
+    if (elements.modalTelegramTutorial) {
+      elements.modalTelegramTutorial.classList.remove('active');
+    }
+  };
+
+  if (elements.btnCloseTelegramModal) elements.btnCloseTelegramModal.addEventListener('click', closeTelegramModal);
+  if (elements.btnUnderstoodTelegram) elements.btnUnderstoodTelegram.addEventListener('click', closeTelegramModal);
 
   // Save config form
   if (elements.configForm) {
