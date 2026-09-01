@@ -1,9 +1,14 @@
-name: Compilar BotTerna para Windows (.exe)
+name: Compilar y Publicar BotTerna para Windows (.exe)
 
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch: # Permite ejecutar la compilación manualmente desde GitHub
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-windows:
@@ -33,10 +38,26 @@ jobs:
         run: |
           python build.py
 
-      - name: 🚀 Subir BotTerna.exe como artefacto descargable
+      - name: 🚀 Subir como artefacto temporal
         uses: actions/upload-artifact@v4
         with:
           name: BotTerna-Windows-x64
           path: dist/BotTerna.exe
           if-no-files-found: error
           retention-days: 30
+
+      - name: 🌟 Publicar directamente en GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "BotTerna - Versión Oficial para Windows"
+          body: |
+            ## 🚀 BotTerna para Windows (64-bit)
+
+            ### 📥 Instrucciones:
+            1. Descarga el archivo **`BotTerna.exe`** adjunto abajo.
+            2. Haz doble clic para abrir el programa (no necesitas tener Python instalado).
+            3. Actívalo con tu clave asignada y configura tus materias.
+          files: dist/BotTerna.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
