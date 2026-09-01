@@ -1,8 +1,23 @@
 import os
+import sys
+
+
+def obtener_ruta_base(estatico=False):
+    """
+    Retorna la ruta base correcta tanto en desarrollo como cuando el programa
+    está empaquetado con PyInstaller (.exe o binario autónomo).
+    - estatico=True: para recursos de la UI empaquetados internamente (sys._MEIPASS).
+    - estatico=False: para datos persistentes (.env, materias.json, perfiles).
+    """
+    if getattr(sys, "frozen", False):
+        if estatico and hasattr(sys, "_MEIPASS"):
+            return sys._MEIPASS
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
 
 
 def cargar_env_local():
-    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    env_path = os.path.join(obtener_ruta_base(estatico=False), ".env")
     if not os.path.isfile(env_path):
         return
 
@@ -55,6 +70,6 @@ def validar_chromedriver(driver_path):
 
 def obtener_ruta_perfil_chrome():
     perfil_relativo = os.getenv("CHROME_USER_DATA_DIR", "./chrome_profile")
-    perfil_abs = os.path.abspath(os.path.join(os.path.dirname(__file__), perfil_relativo))
+    perfil_abs = os.path.abspath(os.path.join(obtener_ruta_base(estatico=False), perfil_relativo))
     os.makedirs(perfil_abs, exist_ok=True)
     return perfil_abs

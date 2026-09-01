@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BotTerna - Automatización de Inscripción</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <i data-lucide="bot"></i>
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="brand-text">
+          <h2>BotTerna</h2>
+          <span class="version-badge">v2.0 Pro</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-view="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="materias">
+          <i data-lucide="book-marked"></i>
+          <span>Materias</span>
+          <span id="badge-materias" class="badge-count">0</span>
+        </button>
+        <button class="nav-item" data-view="config">
+          <i data-lucide="sliders-horizontal"></i>
+          <span>Configuración</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="bot-quick-status">
+          <div class="status-indicator-dot" id="quick-status-dot"></div>
+          <div class="status-info">
+            <span class="status-label">Estado del Bot</span>
+            <span class="status-value" id="quick-status-text">Inactivo</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="view-title">Dashboard</h1>
+          <p id="view-subtitle">Monitoreo en tiempo real y centro de control</p>
+        </div>
+        <div class="header-right">
+          <div class="header-status-pill" id="global-status-pill">
+            <span class="pill-dot"></span>
+            <span class="pill-text" id="global-status-text">Listo para iniciar</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section id="view-dashboard" class="view-panel active">
+        <!-- Hero Action Card -->
+        <div class="hero-control-card glass-panel">
+          <div class="hero-left">
+            <div class="hero-status-tag">
+              <span class="tag-icon"><i data-lucide="shield-check"></i></span>
+              <span id="hero-state-label">Bot en Espera</span>
+            </div>
+            <h2 id="hero-title">Automatización de Inscripción</h2>
+            <p id="hero-desc">El bot iniciará sesión en Terna, monitorizará cupos en las materias deseadas y se inscribirá automáticamente apenas detecte disponibilidad.</p>
+          </div>
+          <div class="hero-right">
+            <button id="btn-toggle-bot" class="btn-hero-action start">
+              <i data-lucide="play" id="btn-bot-icon"></i>
+              <span id="btn-bot-text">Iniciar Inscripción</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card glass-panel">
+            <div class="metric-icon-wrap bg-blue">
+              <i data-lucide="refresh-cw"></i>
+            </div>
+            <div class="metric-data">
+              <span class="metric-title">Intentos / Ciclos</span>
+              <h3 class="metric-value" id="metric-intentos">0</h3>
+            </div>
+          </div>
+
+          <div class="metric-card glass-panel">
+            <div class="metric-icon-wrap bg-purple">
+              <i data-lucide="timer"></i>
+            </div>
+            <div class="metric-data">
+              <span class="metric-title">Tiempo Activo</span>
+              <h3 class="metric-value" id="metric-tiempo">00:00:00</h3>
+            </div>
+          </div>
+
+          <div class="metric-card glass-panel">
+            <div class="metric-icon-wrap bg-amber">
+              <i data-lucide="clock"></i>
+            </div>
+            <div class="metric-data">
+              <span class="metric-title">Materias Pendientes</span>
+              <h3 class="metric-value" id="metric-pendientes">0</h3>
+            </div>
+          </div>
+
+          <div class="metric-card glass-panel">
+            <div class="metric-icon-wrap bg-emerald">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+            <div class="metric-data">
+              <span class="metric-title">Inscritas con Éxito</span>
+              <h3 class="metric-value" id="metric-inscritas">0</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Terminal Card -->
+        <div class="terminal-panel glass-panel">
+          <div class="terminal-header">
+            <div class="terminal-controls">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+              <span class="terminal-title"><i data-lucide="terminal"></i> Consola en Vivo</span>
+            </div>
+            <div class="terminal-actions">
+              <select id="log-filter" class="custom-select">
+                <option value="all">Todos los registros</option>
+                <option value="success">Éxitos y Cupos</option>
+                <option value="warning">Avisos</option>
+                <option value="error">Errores</option>
+              </select>
+              <button id="btn-clear-logs" class="btn-icon-subtle" title="Limpiar Consola">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </div>
+          <div class="terminal-body" id="terminal-logs">
+            <div class="log-line info">
+              <span class="log-time">[00:00:00]</span>
+              <span class="log-badge info">SISTEMA</span>
+              <span class="log-msg">Interfaz lista. Presiona "Iniciar Inscripción" para comenzar.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: MATERIAS -->
+      <section id="view-materias" class="view-panel">
+        <div class="toolbar-materias">
+          <div class="search-wrap">
+            <i data-lucide="search"></i>
+            <input type="text" id="search-materias" placeholder="Buscar materia...">
+          </div>
+          <button id="btn-open-add-modal" class="btn-primary">
+            <i data-lucide="plus"></i>
+            <span>Agregar Materia</span>
+          </button>
+        </div>
+
+        <!-- Materias List / Grid -->
+        <div id="materias-container" class="materias-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- VIEW 3: CONFIGURACIÓN -->
+      <section id="view-config" class="view-panel">
+        <form id="config-form" class="config-grid">
+          
+          <!-- Card 1: Credenciales USM -->
+          <div class="config-card glass-panel">
+            <div class="card-header">
+              <div class="card-header-icon bg-indigo">
+                <i data-lucide="user-check"></i>
+              </div>
+              <div>
+                <h3>Credenciales Terna</h3>
+                <p>Datos de acceso de tu cuenta universitaria USM</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="cfg-user">Usuario Terna</label>
+                <input type="text" id="cfg-user" name="USER_UNI" placeholder="V-12345678" required>
+              </div>
+              <div class="form-group">
+                <label for="cfg-pass">Contraseña Terna</label>
+                <div class="password-input-wrap">
+                  <input type="password" id="cfg-pass" name="PASS_UNI" placeholder="••••••••" required>
+                  <button type="button" class="btn-toggle-pwd" id="btn-toggle-pass" title="Ver/Ocultar">
+                    <i data-lucide="eye" id="icon-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Telegram Notifications -->
+          <div class="config-card glass-panel">
+            <div class="card-header">
+              <div class="card-header-icon bg-blue">
+                <i data-lucide="send"></i>
+              </div>
+              <div>
+                <h3>Notificaciones Telegram</h3>
+                <p>Recibe alertas instantáneas en tu teléfono móvil</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="cfg-token">Bot Token</label>
+                <input type="text" id="cfg-token" name="TOKEN" placeholder="Ej: 8460968012:AAH...">
+              </div>
+              <div class="form-group">
+                <label for="cfg-chatid">Chat ID</label>
+                <input type="text" id="cfg-chatid" name="CHAT_ID" placeholder="Ej: 123456789">
+              </div>
+              <button type="button" id="btn-test-telegram" class="btn-secondary">
+                <i data-lucide="bell-ring"></i>
+                <span>Probar Notificación</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: URLs y Navegación -->
+          <div class="config-card glass-panel">
+            <div class="card-header">
+              <div class="card-header-icon bg-purple">
+                <i data-lucide="globe"></i>
+              </div>
+              <div>
+                <h3>Enlaces del Portal</h3>
+                <p>Direcciones web del sistema Terna</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="cfg-urllogin">URL Login</label>
+                <input type="text" id="cfg-urllogin" name="URL_LOGIN" value="https://usm.terna.net/">
+              </div>
+              <div class="form-group">
+                <label for="cfg-urlinsc">URL Inscripción</label>
+                <input type="text" id="cfg-urlinsc" name="URL_INSCRIPCION" value="https://usm.terna.net/Inscripcion.php?mid=0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Preferencias y Alertas -->
+          <div class="config-card glass-panel">
+            <div class="card-header">
+              <div class="card-header-icon bg-emerald">
+                <i data-lucide="bell"></i>
+              </div>
+              <div>
+                <h3>Preferencias y Alertas</h3>
+                <p>Sonidos del sistema y comportamiento de Chrome</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group-toggle">
+                <div class="toggle-info">
+                  <span class="toggle-title">Alerta Sonora</span>
+                  <span class="toggle-desc">Emite un sonido de campana al abrirse cupos o nuevo semestre</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-sound" checked>
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <button type="button" id="btn-test-sound" class="btn-secondary btn-sm" style="align-self: flex-start;">
+                <i data-lucide="volume-2"></i>
+                <span>Probar Sonido de Alerta</span>
+              </button>
+              <div class="form-group-toggle" style="margin-top: 6px;">
+                <div class="toggle-info">
+                  <span class="toggle-title">Modo Headless</span>
+                  <span class="toggle-desc">Oculta la ventana del navegador para ahorrar recursos</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-headless" name="HEADLESS">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="form-group">
+                <label for="cfg-driver">Ruta ChromeDriver (Opcional)</label>
+                <input type="text" id="cfg-driver" name="CHROMEDRIVER_PATH" placeholder="Dejar vacío para automático">
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Button Bar -->
+          <div class="config-actions">
+            <button type="submit" id="btn-save-config" class="btn-primary btn-save">
+              <i data-lucide="save"></i>
+              <span>Guardar Configuración</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- MODAL: AGREGAR / EDITAR MATERIA -->
+  <div id="modal-add-materia" class="modal-overlay">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i data-lucide="book-plus" id="modal-icon-elem"></i>
+          <h3 id="modal-title-text">Agregar Materia</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="form-add-materia" class="modal-body">
+        <input type="hidden" id="modal-edit-old-nombre" value="">
+        
+        <div class="form-group">
+          <label for="modal-nombre-materia">Nombre de la Asignatura</label>
+          <input type="text" id="modal-nombre-materia" placeholder="Ej: DISEÑO ARQUITECTONICO X" required autofocus>
+          <small class="form-hint">Escribe el nombre tal como aparece en Terna.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-secciones-input">Secciones por Prioridad</label>
+          <div class="tags-input-container" id="tags-container">
+            <input type="text" id="modal-secciones-input" placeholder="Ej: 1MB (Presiona Enter)">
+          </div>
+          <small class="form-hint">Las secciones de la izquierda tendrán mayor prioridad al buscar cupos.</small>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-modal-submit">
+            <i data-lucide="check" id="modal-submit-icon"></i>
+            <span id="modal-btn-submit-text">Guardar Materia</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OVERLAY DE ACTIVACIÓN / LICENCIA BLOQUEANTE -->
+  <div id="activation-overlay" class="activation-backdrop">
+    <div class="activation-card glass-panel">
+      <div class="activation-badge-icon">
+        <i data-lucide="shield-check"></i>
+      </div>
+      <h2>Activación de BotTerna</h2>
+      <p class="activation-subtitle">Ingresa tu clave de acceso para desbloquear el bot en este equipo.</p>
+      
+      <form id="form-activation" class="activation-form">
+        <div class="form-group">
+          <label for="input-license-key">Clave de Licencia</label>
+          <div class="key-input-wrap">
+            <i data-lucide="key-round"></i>
+            <input type="text" id="input-license-key" placeholder="TERNA-2026-XXXX-XXXX" autocomplete="off" spellcheck="false" required>
+          </div>
+        </div>
+
+        <div class="hwid-info-row">
+          <span>ID de este equipo:</span>
+          <code id="display-hwid">HWID-CALCULANDO...</code>
+        </div>
+
+        <div id="activation-error-msg" class="activation-error hidden"></div>
+
+        <button type="submit" id="btn-activate-license" class="btn-primary btn-block">
+          <i data-lucide="unlock" id="btn-activate-icon"></i>
+          <span id="btn-activate-text">Activar Licencia</span>
+        </button>
+      </form>
+
+      <div class="activation-footer">
+        <span>¿No tienes una clave? Solicítala a tu administrador.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

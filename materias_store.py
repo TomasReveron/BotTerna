@@ -1,18 +1,25 @@
 import json
 import os
 from time import strftime
+from config import obtener_ruta_base
 
 
 def cargar_materias():
-    materias_path = os.path.join(os.path.dirname(__file__), "materias.json")
+    materias_path = os.path.join(obtener_ruta_base(estatico=False), "materias.json")
     if not os.path.isfile(materias_path):
-        raise SystemExit("No se encontro materias.json en el proyecto.")
+        # Si no existe, crear una estructura base por defecto
+        base_materias = {}
+        guardar_materias(base_materias)
+        return base_materias
 
     with open(materias_path, "r", encoding="utf-8") as materias_file:
-        data = json.load(materias_file)
+        try:
+            data = json.load(materias_file)
+        except Exception:
+            data = {}
 
-    if not isinstance(data, dict) or not data:
-        raise SystemExit("materias.json debe contener un objeto con materias y secciones.")
+    if not isinstance(data, dict):
+        return {}
 
     normalizado = {}
     for nombre, valor in data.items():
@@ -21,11 +28,11 @@ def cargar_materias():
             continue
 
         if not isinstance(valor, dict):
-            raise SystemExit("Cada materia debe ser una lista o un objeto con secciones.")
+            continue
 
-        secciones = valor.get("secciones")
-        if not isinstance(secciones, list) or not secciones:
-            raise SystemExit("Cada materia debe tener una lista de secciones.")
+        secciones = valor.get("secciones", [])
+        if not isinstance(secciones, list):
+            secciones = []
 
         inscrita = bool(valor.get("inscrita", False))
         normalizado[nombre] = {"secciones": secciones, "inscrita": inscrita}
@@ -34,7 +41,7 @@ def cargar_materias():
 
 
 def guardar_materias(materias):
-    materias_path = os.path.join(os.path.dirname(__file__), "materias.json")
+    materias_path = os.path.join(obtener_ruta_base(estatico=False), "materias.json")
     with open(materias_path, "w", encoding="utf-8") as materias_file:
         json.dump(materias, materias_file, ensure_ascii=False, indent=2)
 

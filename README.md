@@ -1,31 +1,38 @@
-# 🤖 BotTerna - Automatización de Inscripción
+# 🤖 BotTerna - Centro de Automatización de Inscripción
 
-Bot avanzado para la automatización de inscripción en Terna (USM), optimizado para evitar detecciones y agilizar el proceso de captura de cupos.
+Bot avanzado con **Interfaz Gráfica Moderna (PyWebView / Dark Glassmorphic UI)** para la automatización de inscripción en el portal Terna (USM), optimizado para bypass de detecciones y monitoreo ultra-rápido de cupos.
+
+---
+
+## ✨ Características Principales
+
+- **🖥️ Interfaz Gráfica Moderna:** Diseño oscuro premium con estética Glassmorphic (tipo Vercel/Discord), monitoreo de estadísticas en tiempo real y consola integrada.
+- **📚 Gestión Visual de Materias y Secciones:** Añade asignaturas y define múltiples secciones con **orden de prioridad visual** (`#1 1MB`, `#2 1MA`, etc.) sin editar archivos JSON manualmente.
+- **⚡ Control Total en 1 Clic:** Botones de Iniciar / Detener, selector de modo Headless (ocultar navegador) y prueba de conexión inmediata con Telegram.
+- **🛡️ Bypass Anti-Detección:** Basado en `undetected-chromedriver` con perfiles persistentes.
+- **🔄 Relogueo Inteligente:** Renovación periódica de sesión para asegurar que la vista de materias esté siempre actualizada.
+- **📱 Notificaciones por Telegram:** Alertas instantáneas al abrirse cupos o completarse la inscripción.
 
 ---
 
 ## 📋 Requisitos Previos
 
-- **Python 3.9+** (Recomendado 3.11).
-- **Google Chrome** instalado en su versión más reciente.
-- **ChromeDriver**: Compatible con tu versión de Chrome.
-- **Telegram (Opcional)**: Un bot creado vía `@BotFather` si deseas recibir notificaciones.
+- **Python 3.9+** (Recomendado 3.11 o superior).
+- **Google Chrome** instalado en el sistema.
 
 ---
 
-## 🛠️ Instalación Paso a Paso
+## 🛠️ Instalación Rápida
 
-### 1. Preparación del Proyecto
-Clona el repositorio o descarga los archivos en una carpeta local.
+### 1. Clonar o descargar el repositorio
+Abre una terminal en la carpeta del proyecto.
 
-### 2. Configuración del Entorno Virtual (Recomendado)
-Abre una terminal en la carpeta del proyecto y ejecuta:
+### 2. Configurar el Entorno Virtual
 
 **En Linux / macOS:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -33,19 +40,33 @@ pip install -r requirements.txt
 ```powershell
 python -m venv venv
 .\venv\Scripts\activate
-pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configuración del Driver (Opcional)
-- El bot gestiona y descarga automáticamente el ChromeDriver compatible con tu versión de Google Chrome tanto en Windows como en Linux/macOS.
-- Si prefieres usar un binario manual, coloca el archivo `chromedriver` (o `chromedriver.exe` en Windows) en la carpeta del proyecto y especifica su ruta en el `.env`.
+---
+
+## 🚀 Cómo Ejecutar
+
+### Modo Interfaz Gráfica (Recomendado)
+Asegúrate de tener el entorno virtual activado y ejecuta:
+
+```bash
+python main.py
+```
+*(O también `python run_gui.py`)*
+
+### Modo Terminal / Consola (CLI)
+Si prefieres ejecutar el bot directamente en segundo plano o en un servidor sin entorno gráfico:
+
+```bash
+python main.py --cli
+```
 
 ---
 
-## ⚙️ Configuración del Bot (`.env`)
+## ⚙️ Configuración
 
-Crea un archivo llamado `.env` en la raíz del proyecto y completa los siguientes datos:
+Puedes configurar todo directamente desde la pestaña **Configuración** en la aplicación gráfica, o si lo prefieres, editar el archivo `.env`:
 
 ```env
 # CREDENCIALES TERNA (Requerido)
@@ -60,49 +81,6 @@ URL_INSCRIPCION=https://usm.terna.net/Inscripcion.php?mid=0
 TOKEN=8460968012:AAHOs7i8kWrg0Y5XNBCGWXU-gOSUzW41zcA
 CHAT_ID=TU_CHAT_ID
 
-# RUTA DEL DRIVER (Opcional - Si lo omites, se descargará automáticamente)
-# CHROMEDRIVER_PATH=./chromedriver.exe   (En Windows)
-# CHROMEDRIVER_PATH=./chromedriver       (En Linux)
-
+# MODO HEADLESS (true para ocultar navegador, false para ver la ventana)
+HEADLESS=false
 ```
-
----
-
-## 📚 Configuración de Materias (`materias.json`)
-
-Edita el archivo `materias.json` para definir qué materias quieres inscribir y en qué secciones.
-
-**Formato:**
-```json
-{
-  "NOMBRE DE LA MATERIA": {
-    "secciones": ["SECCION (1MA)"],
-    "inscrita": false
-  }
-}
-```
-*El bot solo intentará inscribir aquellas donde `"inscrita"` sea `false`.*
-
----
-
-## 🚀 Cómo Ejecutar
-
-Asegúrate de tener el entorno virtual activado y ejecuta:
-
-```bash
-python main.py
-```
-
-### Características del Bot:
-- **Bypass de Seguridad:** Utiliza `undetected-chromedriver` para evitar bloqueos.
-- **Relogueo Automático:** Cada ciclo de espera realiza un logout/login completo para mantener la sesión fresca.
-- **Detección Inteligente:** Solo intenta inscribir si detecta que hay cupos disponibles (formato `SECCIÓN:CUPOS > 0`).
-- **Notificaciones:** Te avisa por Telegram apenas las materias aparecen o se inscriben con éxito.
-
----
-
-## ❓ Solución de Problemas
-
-- **Error de Conector:** Asegúrate de que la ruta en `CHROMEDRIVER_PATH` sea absoluta o relativa correcta y que el archivo tenga permisos.
-- **Detección de Bot:** El bot usa técnicas de sigilo, pero si Terna muestra un Captcha, el navegador se detendrá unos segundos para permitirte cargarlo (o puedes ajustar el `sleep` en `bot.py`).
-- **Cierre Inesperado:** Revisa que tus credenciales en el `.env` sean correctas.

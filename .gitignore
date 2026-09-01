@@ -9,3 +9,7 @@
 *.log
 /chrome_profile_cuenta1
 /chrome_profile_cuenta2
+license.json
+dist/
+build/
+*.spec

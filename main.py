@@ -1,8 +1,20 @@
+import os
+import sys
+
+# Configurar locale UTF-8 para evitar advertencias de Qt en Linux
+if "LANG" not in os.environ or "UTF-8" not in os.environ.get("LANG", ""):
+    os.environ["LANG"] = "C.UTF-8"
+if "LC_ALL" not in os.environ or "UTF-8" not in os.environ.get("LC_ALL", ""):
+    os.environ["LC_ALL"] = "C.UTF-8"
+
+os.environ.setdefault("QT_LOGGING_RULES", "qt.qpa.locale.warning=false")
+
 from time import sleep
 from bot import iniciar_bot
 from materias_store import cargar_materias, materias_pendientes
 
-if __name__ == "__main__":
+
+def ejecutar_cli():
     try:
         materias = cargar_materias()
         if len(materias_pendientes(materias)) == 0:
@@ -16,7 +28,6 @@ if __name__ == "__main__":
                 print("\n✅ Proceso completado: Todas las materias fueron inscritas con éxito.")
                 break
             
-            # Si hubo un fallo inesperado del navegador, reintentar tras una breve pausa
             materias_actuales = cargar_materias()
             if len(materias_pendientes(materias_actuales)) == 0:
                 print("\n✅ No quedan materias pendientes por inscribir.")
@@ -27,3 +38,15 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("\n🛑 Programa finalizado por el usuario.")
+
+
+if __name__ == "__main__":
+    if "--cli" in sys.argv:
+        ejecutar_cli()
+    else:
+        try:
+            from run_gui import main as ejecutar_gui
+            ejecutar_gui()
+        except ImportError as e:
+            print(f"⚠️  No se pudo cargar la interfaz gráfica ({e}). Ejecutando en modo consola...")
+            ejecutar_cli()

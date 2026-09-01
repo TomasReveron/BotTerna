@@ -1,13 +1,8 @@
 {
-  "ELE A:GERENCIA ESTRATEGICA": {
-    "secciones": [
-      "1MA"
-    ],
-    "inscrita": false
-  },
   "COMPORTAMIENTO ORGANIZACIONAL": {
     "secciones": [
-      "1MA"
+      "1MA",
+      "1MC"
     ],
     "inscrita": false
   },
