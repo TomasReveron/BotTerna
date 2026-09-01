@@ -4,18 +4,26 @@ import subprocess
 import shutil
 import argparse
 
+# Forzar codificación UTF-8 en terminales de Windows
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 def build(onefile=True):
     print("==================================================")
-    print("🔨 BOTTERNA - COMPILADOR A EJECUTABLE AUTÓNOMO")
+    print("[*] BOTTERNA - COMPILADOR A EJECUTABLE AUTONOMO")
     print("==================================================")
 
     # 1. Verificar e instalar PyInstaller si falta
     try:
         import PyInstaller
-        print("✅ PyInstaller detectado.")
+        print("[+] PyInstaller detectado.")
     except ImportError:
-        print("📦 Instalando PyInstaller...")
+        print("[+] Instalando PyInstaller...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
 
     # 2. Definir separador de datos según sistema operativo
@@ -40,7 +48,7 @@ def build(onefile=True):
 
     cmd.append("main.py")
 
-    print("\n⚙️  Iniciando proceso de empaquetado (esto puede tardar unos segundos)...")
+    print("\n[+] Iniciando proceso de empaquetado...")
     print(f"Comando: {' '.join(cmd)}\n")
 
     result = subprocess.run(cmd)
@@ -49,13 +57,13 @@ def build(onefile=True):
         exe_suffix = ".exe" if os.name == "nt" else ""
         target = os.path.join(os.path.dirname(__file__), "dist", f"BotTerna{exe_suffix}") if onefile else os.path.join(os.path.dirname(__file__), "dist", "BotTerna")
         print("\n==================================================")
-        print("🎉 ¡COMPILACIÓN EXITOSA!")
+        print("[OK] COMPILACION EXITOSA!")
         print("==================================================")
-        print(f"📁 Tu aplicación ejecutable está lista en:")
-        print(f"👉 {target}")
+        print(f"[*] Tu aplicacion ejecutable esta lista en:")
+        print(f"-> {target}")
         print("==================================================")
     else:
-        print("\n❌ Ocurrió un error durante la compilación.")
+        print("\n[!] Ocurrio un error durante la compilacion.")
         sys.exit(result.returncode)
 
 
